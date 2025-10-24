@@ -23,36 +23,10 @@ The monitoring architecture includes the following key components:
 
 * Node.js Demo App → Sample web app exporting Prometheus-compatible metrics.
 
-## 🏗️ Architecture Diagram  
+## 🏗️ Architecture Diagram   
 
-               ┌────────────────────────────┐
-               │      Grafana Dashboard     │
-               │  (Visualizes Prometheus)   │
-               └────────────┬───────────────┘
-                            │
-                ┌───────────▼───────────┐
-                │     Prometheus        │
-                │ (Scrapes + Evaluates) │
-                └───────────┬───────────┘
-                            │
-        ┌───────────────────┼──────────────────┐
-        │                   │                  │
-┌───────▼───────┐   ┌───────▼────────┐   ┌─────▼────────┐
-│ Node Exporter │   │ kube-state-m.  │   │ Node.js App  │
-│ (Node-level)  │   │ (Cluster state)│   │ (/metrics)   │
-└───────────────┘   └────────────────┘   └──────────────┘
-        │
-┌───────▼────────┐
-│  Kubelet +     │
-│  cAdvisor       │
-│ (Pod/container) │
-└────────────────┘
-        │
-   ┌────▼────┐
-   │ Alerts  │
-   │ via     │
-   │ Alertmanager ───► Discord Notifications
-   └─────────┘
+
+               
           
 
             
@@ -263,7 +237,6 @@ Commands:
 Outcome:
 Prometheus, Alertmanager, Grafana, exporters, and CRDs auto-installed and preconfigured.
 
-🧠 Sequence Summary Diagram
 1️⃣ Prometheus Operator Installed
        ↓
 2️⃣ Prometheus + Alertmanager CRDs Created
@@ -280,7 +253,6 @@ Prometheus, Alertmanager, Grafana, exporters, and CRDs auto-installed and precon
        ↓
 8️⃣ Grafana Visualizes Metrics & Alerts
 
-✅ Outcome
 
 After completing all steps, your setup provides:
 
