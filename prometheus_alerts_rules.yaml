@@ -1,0 +1,113 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kubernetes-ai-alerts
+  namespace: default
+  labels:
+    app: prometheus
+    #release: prometheus
+spec:
+  groups:
+  - name: ai-kubernetes-alerts
+    rules:
+    - alert: PodImagePullError
+      expr: kube_pod_container_status_waiting_reason{reason=~"ImagePullBackOff|ErrImagePull"} > 0
+      for: 15s
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "Pod image pull error detected"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} failed to pull image. Verify image name, tag, or registry credentials."
+
+    - alert: CrashLoopBackOff
+      expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} > 0
+      for: 15s
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "Pod in CrashLoopBackOff state"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is restarting repeatedly. Check logs and resource limits."
+
+    - alert: PodOOMKilled
+      expr: kube_pod_container_status_terminated_reason{reason="OOMKilled"} > 0
+      for: 1m
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "Container OOMKilled"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} was OOMKilled. Consider increasing memory limits."
+
+    - alert: HighCpuUsage
+      expr: sum(rate(container_cpu_usage_seconds_total{image!=""}[2m])) by (pod, namespace) > 0.8
+      for: 2m
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "High CPU usage detected"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is using >80% CPU for 2 minutes."
+
+    - alert: HighMemoryUsage
+      expr: sum(container_memory_usage_bytes{image!=""}) by (pod, namespace)
+        / sum(kube_pod_container_resource_limits_memory_bytes{image!=""}) by (pod, namespace) > 0.9
+      for: 2m
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "High memory usage detected"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is using >90% of its memory limit."
+
+    - alert: NodeDown
+      expr: up{job="node-exporter"} == 0
+      for: 1m
+      labels:
+        severity: critical
+        ai_alert: "true"
+      annotations:
+        summary: "Node down"
+        description: "Node {{ $labels.instance }} is not responding."
+
+    - alert: PodNetworkUnavailable
+      expr: kube_pod_status_reason{reason="NetworkUnavailable"} > 0
+      for: 1m
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "Pod network unavailable"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has network connectivity issues."
+
+    - alert: NodeDiskPressure
+      expr: kube_node_status_condition{condition="DiskPressure", status="true"} == 1
+      for: 2m
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "Node disk pressure"
+        description: "Node {{ $labels.node }} has DiskPressure=true. Check disk space or I/O bottlenecks."
+
+    - alert: PodPending
+      expr: kube_pod_status_phase{phase="Pending"} > 0
+      for: 3m
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "Pod pending too long"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} pending >3m. Possible scheduling/resource issues."
+
+    - alert: PodUnschedulable
+      expr: kube_pod_status_unschedulable > 0
+      for: 2m
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "Pod unschedulable"
+        description: "Pod {{ $labels.pod }} cannot be scheduled due to resource constraints."
+

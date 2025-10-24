@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cafe-nodejs-servicemonitor
+  labels:
+    release: prometheus  # Must match your Prometheus release label!
+spec:
+  selector:
+    matchLabels:
+      app: cafe-nodejs-app
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+

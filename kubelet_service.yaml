@@ -1,0 +1,16 @@
+# kubelet-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubelet
+  namespace: kube-system
+  labels:
+    k8s-app: kubelet
+spec:
+  selector:
+    component: kubelet
+  ports:
+    - name: https-metrics
+      port: 10250
+      targetPort: 10250
+

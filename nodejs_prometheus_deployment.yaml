@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-nodejs-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cafe-nodejs-app
+  template:
+    metadata:
+      labels:
+        app: cafe-nodejs-app
+      annotations:
+        co.elastic.logs/enabled: "true"
+        co.elastic.logs/module: "nodejs"
+    spec:
+      containers:
+        - name: cafe-nodejs-app
+          image: sreedocker123/nodejs_prometheus_mtrics:v4
+          ports:
+            - containerPort: 3000
+

@@ -1,0 +1,14 @@
+# alertmanager.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: Alertmanager
+metadata:
+  name: alertmanager
+  labels:
+    app: alertmanager
+spec:
+  replicas: 1
+  serviceAccountName: alertmanager
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+
