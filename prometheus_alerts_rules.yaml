@@ -111,3 +111,14 @@ spec:
         summary: "Pod unschedulable"
         description: "Pod {{ $labels.pod }} cannot be scheduled due to resource constraints."
 
+
+    # ☕ 11. Café App High Request Count
+    - alert: CafeHighRequestCount
+      expr: cafe_welcome_requests_total > 100
+      for: 1m
+      labels:
+        severity: warning
+        ai_alert: "true"
+      annotations:
+        summary: "High request count in Café App"
+        description: "Café app total welcome requests ({{ $value }}) exceeded 100. Check traffic or app performance."
