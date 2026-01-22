@@ -36,9 +36,9 @@ The monitoring architecture includes the following key components:
 Objective:
 * Deploy the Prometheus Operator and its required CRDs to manage all Prometheus, Alertmanager, and related custom resources.
 
-Command:
-
-* kubectl create -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/master/bundle.yaml
+```bash
+kubectl create -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/master/bundle.yaml
+```
 
 ### 2️⃣ Configure RBAC for Prometheus
 
@@ -46,38 +46,41 @@ Objective:
 * Grant Prometheus permissions to access nodes, services, and pods for metric collection.
 * Include Service Account, Cluster Role definition and Role Bindings. 
 
-Command:
-* kubectl apply -f prom_rbac.yaml
+```bash
+kubectl apply -f prom_rbac.yaml
+```
 
 ### 3️⃣ Deploy Prometheus StatefulSet
 
 Objective:
 Deploy Prometheus as a StatefulSet with persistent data storage and Operator-managed lifecycle.
 
-Command:
+```bash
 kubectl apply -f prometheus.yaml
+```
 
 ### 4️⃣ Create Prometheus Service
 
 Objective:
 * Expose Prometheus internally for service discovery and scraping.
 
-Command:
-* kubectl apply -f prometheus_svc.yaml
+```bash
+kubectl apply -f prometheus_svc.yaml
+```
 
 ### 5️⃣ Deploy Node.js Application with Metrics
 
 Objective:
 * Deploy a sample Node.js app that exposes /metrics endpoint for Prometheus scraping via ServiceMonitor.
 
-Commands:
+```bash
 
-* kubectl apply -f nodejs_prometheus_deployment.yaml
+kubectl apply -f nodejs_prometheus_deployment.yaml
 
-* kubetcl apply -f nodejs_prometheus_service.yaml
+kubetcl apply -f nodejs_prometheus_service.yaml
  
-* kubetcl apply -f nodejs_prometheus_service_monitor.yaml  
-
+kubetcl apply -f nodejs_prometheus_service_monitor.yaml  
+```
 
 * Verify the app exposes Prometheus metrics such as request rate, CPU, memory, heap, GC stats, etc.
 
@@ -86,9 +89,9 @@ Commands:
 Objective:
 * Install Grafana for visualizing Prometheus metrics through dashboards.
 
-Command:
-* kubectl apply -f grafana_deploy_svc.yaml
-
+```bash
+kubectl apply -f grafana_deploy_svc.yaml
+```
 Outcome:
 * Grafana UI accessible at NodeIP:30030, pre-configured with Prometheus as data source.
 
@@ -98,21 +101,21 @@ Objective:
 * Set up Alertmanager for alert routing and integration with Discord.
 * Grant required permissions via RBAC.
 
-Commands:
+```bash
 
-* kubectl apply -f alertmanager_rbac.yaml
-
-* kubectl apply -f alertmanager_deploy.yaml
-
-* kubectl apply -f alertmanager_svc.yaml
+kubectl apply -f alertmanager_rbac.yaml
+kubectl apply -f alertmanager_deploy.yaml
+kubectl apply -f alertmanager_svc.yaml
+```
 
 ### 8️⃣ Configure Alertmanager for Discord Notifications
 
 Objective:
 * Create a Kubernetes Secret containing the Alertmanager configuration to send alerts to a Discord webhook.
 
-Command:
-* kubectl apply -f alertmanager_secret_config.yaml
+```bash 
+kubectl apply -f alertmanager_secret_config.yaml
+```
 
 Result:
 * Alertmanager routes alerts from Prometheus to Discord channels based on severity and labels.
@@ -136,8 +139,9 @@ Objective:
 
 * Disk Pressure
 
-Command:
-* kubectl apply -f prometheus_alert_rules.yaml
+```bash
+kubectl apply -f prometheus_alert_rules.yaml
+```
 
 Result:
 * Alerts visible under Prometheus → Alerts, firing when thresholds are met and sent to Discord.
@@ -148,28 +152,30 @@ A. Kube-State-Metrics
 Objective:
 Export cluster object state metrics (Deployments, Pods, StatefulSets, etc.) to Prometheus.
 
-Command:
-* kubectl apply -f kube_state_metrics.yaml
+```bash
+kubectl apply -f kube_state_metrics.yaml
+```
 
 B. Node Exporter
 
 Objective:
 Expose node-level metrics (CPU, RAM, filesystem) using a DaemonSet.
 
-Command:
-
-* kubectl apply -f node_exporter.yaml
+```bash
+kubectl apply -f node_exporter.yaml
+```
 
 ### 1️⃣1️⃣ Configure ServiceMonitors for Exporters
 
 Objective:
 Tell Prometheus Operator to scrape metrics from Kube-State-Metrics and Node Exporter services.
 
-Commands:
+```bash
 
-* kubectl apply -f kube_state_metrics_service_monitor.yaml
+kubectl apply -f kube_state_metrics_service_monitor.yaml
 
-* kubectl apply -f node_exporter_service_monitor.yaml
+kubectl apply -f node_exporter_service_monitor.yaml
+```
 
 Result:
 * Prometheus now collects node and cluster-level metrics.
@@ -179,11 +185,12 @@ Result:
 Objective:
 Scrape kubelet /metrics and /metrics/cadvisor for per-pod and per-container CPU/memory data.
 
-Commands:
+```bash
 
-* kubectl apply -f kubelet-service.yaml
+kubectl apply -f kubelet-service.yaml
 
-* kubectl apply -f kubelet-servicemonitor.yaml
+kubectl apply -f kubelet-servicemonitor.yaml
+```
 
 Result:
 * Prometheus discovers new kubelet and kubelet-cadvisor targets.
@@ -203,9 +210,10 @@ Objectives:
 
 * Simulate test alerts (CrashLoopBackOff, ImagePullBackOff)
 
-Example Commands:
-* kubectl run badpod --image=nonexistent:latest
-* kubectl run crashloop-demo --image=busybox --restart=Always --command -- sh -c "sleep 2; exit 1"
+```bash
+kubectl run badpod --image=nonexistent:latest
+kubectl run crashloop-demo --image=busybox --restart=Always --command -- sh -c "sleep 2; exit 1"
+```
 
 Result:
 * Prometheus alerts trigger and notifications sent to Discord.
@@ -213,28 +221,30 @@ Result:
 ### 1️⃣4️⃣ Verify Setup
 
 Check:
+```bash
+kubectl get prometheusrules
 
-* kubectl get prometheusrules
+kubectl get prometheus
 
-* kubectl get prometheus
+kubectl logs -l alertmanager=alertmanager
 
-* kubectl logs -l alertmanager=alertmanager
-
-* kubectl exec -it $(kubectl get pod -l prometheus=prometheus -o name) -- prometheus --version
+kubectl exec -it $(kubectl get pod -l prometheus=prometheus -o name) -- prometheus --version
+```
 
 ### 1️⃣5️⃣ (Optional) Install via Helm
 
 Objective:
 Install the entire monitoring stack using the official Helm chart to demonstrate GitOps or easier management.
 
-Commands:
+```bash
 
-* helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-* helm repo update
-* helm install prometheus prometheus-community/kube-prometheus-stack
-
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack
+```
 
 Outcome:
+```bash
 Prometheus, Alertmanager, Grafana, exporters, and CRDs auto-installed and preconfigured.
 
 1️⃣ Prometheus Operator Installed
@@ -252,7 +262,7 @@ Prometheus, Alertmanager, Grafana, exporters, and CRDs auto-installed and precon
 7️⃣ Alertmanager Routes Alerts → Discord
        ↓
 8️⃣ Grafana Visualizes Metrics & Alerts
-
+```
 
 After completing all steps, your setup provides:
 
