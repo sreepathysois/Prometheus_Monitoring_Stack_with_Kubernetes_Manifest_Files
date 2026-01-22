@@ -25,7 +25,43 @@ The monitoring architecture includes the following key components:
 
 ## 🏗️ Architecture Diagram   
 
+```mermaid
+flowchart LR
+    subgraph Kubernetes_Cluster["Kubernetes Cluster"]
+        
+        subgraph Monitoring["Monitoring Namespace"]
+            PO[Prometheus Operator]
+            PROM[Prometheus]
+            AM[Alertmanager]
+            GRAF[Grafana]
+        end
 
+        subgraph Exporters["Metrics Sources / Exporters"]
+            NE[Node Exporter]
+            KSM[Kube-State-Metrics]
+            KUBELET[Kubelet + cAdvisor]
+            APP[Node.js Demo App<br/>/metrics]
+        end
+    end
+
+    %% Operator Management
+    PO -->|Creates & Manages| PROM
+    PO -->|Creates & Manages| AM
+
+    %% Scraping Relationships
+    PROM -->|Scrapes| NE
+    PROM -->|Scrapes| KSM
+    PROM -->|Scrapes| KUBELET
+    PROM -->|Scrapes| APP
+
+    %% Alert Flow
+    PROM -->|Fires Alerts| AM
+    AM -->|Sends Notifications| DISCORD[Discord Channel]
+
+    %% Visualization
+    PROM -->|Query Metrics| GRAF
+    GRAF -->|Dashboards| USER[Users / SREs]
+```
                
           
 
