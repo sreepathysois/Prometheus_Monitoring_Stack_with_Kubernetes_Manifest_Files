@@ -311,6 +311,7 @@ After completing all steps, your setup provides:
 * Visualization	Grafana	Unified dashboards for all layers
 ### 📊 Validation Checks
 
+```bash
 * Prometheus UI → http://<NodeIP>:9090
 
 * Grafana UI → http://<NodeIP>:30030
@@ -318,6 +319,7 @@ After completing all steps, your setup provides:
 * Alertmanager UI → http://<NodeIP>:30093
 
 * Discord Channel → Alert notifications visible
+```
 
 ### 🌟 Highlights
 
